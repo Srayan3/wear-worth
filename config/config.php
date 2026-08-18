@@ -17,7 +17,7 @@ define('DB_CHARSET', 'utf8mb4');
 // Site
 // ---------------------------------------------------------------------------
 // Full base URL with NO trailing slash, e.g. https://www.yourstore.com
-define('BASE_URL', 'https://wear-worth.com');
+define('BASE_URL', 'http://wear-worth.com');
 
 // Absolute filesystem path to the project root (auto-detected, override if needed)
 define('ROOT_PATH', dirname(__DIR__));
