@@ -8,16 +8,16 @@
 // Database
 // ---------------------------------------------------------------------------
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'wearworth');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'wearwort_db');
+define('DB_USER', 'wearwort_srayan');
+define('DB_PASS', 'G48733784g');
 define('DB_CHARSET', 'utf8mb4');
 
 // ---------------------------------------------------------------------------
 // Site
 // ---------------------------------------------------------------------------
 // Full base URL with NO trailing slash, e.g. https://www.yourstore.com
-define('BASE_URL', 'http://localhost/WearWorth/store');
+define('BASE_URL', 'https://wear-worth.com');
 
 // Absolute filesystem path to the project root (auto-detected, override if needed)
 define('ROOT_PATH', dirname(__DIR__));
