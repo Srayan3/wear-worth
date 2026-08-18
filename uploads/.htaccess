@@ -1,0 +1,6 @@
+# Product images must be publicly viewable, but nothing here should ever execute.
+<FilesMatch "\.(php|phtml|php\d|phar|cgi|pl|py|sh)$">
+    Require all denied
+</FilesMatch>
+
+Options -Indexes -ExecCGI

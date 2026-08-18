@@ -1,0 +1,7 @@
+# /config/config.php
+# /uploads/products/*
+# !/uploads/products/.htaccess
+# .DS_Store
+# Thumbs.db
+/config/config.example.php
+/config - Copy/*

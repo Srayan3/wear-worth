@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <rect width="800" height="1000" fill="#EDEAE4"/>
+  <rect x="24" y="24" width="752" height="952" fill="none" stroke="#9A9284" stroke-width="1"/>
+  <g transform="translate(300,320) scale(2)">
+    <circle cx="100" cy="80" r="22" fill="none" stroke="#141414" stroke-width="2"/><path d="M100 102 C 90 150, 90 190, 100 230 C 110 190, 110 150, 100 102 Z" fill="none" stroke="#141414" stroke-width="1.4"/>
+  </g>
+  <text x="400" y="860" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="2" fill="#141414">Jewelry</text>
+  <text x="400" y="900" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" letter-spacing="4" fill="#9A9284">SAMPLE PHOTOGRAPHY — REPLACE IN ADMIN</text>
+</svg>

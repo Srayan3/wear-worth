@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000">
+  <rect width="800" height="1000" fill="#F4F2EE"/>
+  <rect x="24" y="24" width="752" height="952" fill="none" stroke="#9A9284" stroke-width="1"/>
+  <g transform="translate(300,320) scale(2)">
+    <path d="M100 40 C 80 60, 70 110, 90 260 L 130 260 C 145 130, 150 70, 100 40 Z" fill="none" stroke="#141414" stroke-width="2"/><path d="M90 70 L 60 230" fill="none" stroke="#141414" stroke-width="1.4"/><path d="M115 55 L 150 240" fill="none" stroke="#141414" stroke-width="1.4"/>
+  </g>
+  <text x="400" y="860" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="30" letter-spacing="2" fill="#141414">Saree</text>
+  <text x="400" y="900" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="14" letter-spacing="4" fill="#9A9284">SAMPLE PHOTOGRAPHY — REPLACE IN ADMIN</text>
+</svg>
