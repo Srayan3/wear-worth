@@ -36,7 +36,7 @@
 <header class="site-header">
     <div class="site-header__bar"></div>
     <div class="container nav-inner">
-        <a href="<?= url('') ?>" class="brand">WW</a>
+        <a href="<?= url('') ?>" class="brand"><?= e(setting('store_name', 'Atelier')) ?></a>
 
         <nav aria-label="Main">
             <ul class="nav-links">
