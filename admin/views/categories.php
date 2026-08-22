@@ -21,8 +21,8 @@
             <span style="font-weight:400; font-size:12px; color:var(--a-muted);"><?= (int) $cat['subcategory_count'] ?> subcategories · <?= e($cat['gender_name']) ?></span>
         </div>
         <div class="a-tree-cat__actions">
-            <button type="button" class="a-btn a-btn-outline a-btn-sm" onclick='openSubcategoryModal(<?= (int) $cat["id"] ?>, <?= json_encode($cat["name"]) ?>)'>+ Subcategory</button>
-            <button type="button" class="a-btn a-btn-outline a-btn-sm" onclick='openCategoryModal(<?= json_encode($cat + ["image_url" => $cat["image"] ? url($cat["image"]) : ""]) ?>)'>Edit</button>
+            <button type="button" class="a-btn a-btn-outline a-btn-sm" data-category-id="<?= (int) $cat['id'] ?>" data-category-name="<?= e($cat['name']) ?>" onclick="openSubcategoryModal(parseInt(this.dataset.categoryId, 10), this.dataset.categoryName)">+ Subcategory</button>
+            <button type="button" class="a-btn a-btn-outline a-btn-sm" data-category='<?= e(json_encode($cat + ["image_url" => $cat["image"] ? url($cat["image"]) : ""])) ?>' onclick="openCategoryModal(JSON.parse(this.dataset.category))">Edit</button>
             <form method="post" style="display:inline;">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_category">
@@ -45,7 +45,7 @@
             <span style="font-size:12px; color:var(--a-muted); margin-left:8px;"><?= (int) $sub['product_count'] ?> products</span>
         </div>
         <div class="a-tree-sub__actions">
-            <button type="button" class="a-btn a-btn-outline a-btn-sm" onclick='openSubcategoryModal(<?= (int) $cat["id"] ?>, <?= json_encode($cat["name"]) ?>, <?= json_encode($sub) ?>)'>Edit</button>
+            <button type="button" class="a-btn a-btn-outline a-btn-sm" data-category-id="<?= (int) $cat['id'] ?>" data-category-name="<?= e($cat['name']) ?>" data-subcategory='<?= e(json_encode($sub)) ?>' onclick="openSubcategoryModal(parseInt(this.dataset.categoryId, 10), this.dataset.categoryName, JSON.parse(this.dataset.subcategory))">Edit</button>
             <form method="post" style="display:inline;">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_subcategory">

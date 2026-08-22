@@ -12,7 +12,7 @@
             <td><span class="status-pill" style="background:<?= e($s['color']) ?>;"><?= e($s['name']) ?></span></td>
             <td><?= e($s['color']) ?></td>
             <td style="display:flex; gap:8px;">
-                <button type="button" class="a-btn a-btn-outline a-btn-sm" onclick='openStatusModal(<?= json_encode($s) ?>)'>Edit</button>
+                <button type="button" class="a-btn a-btn-outline a-btn-sm" data-status='<?= e(json_encode($s)) ?>' onclick="openStatusModal(JSON.parse(this.dataset.status))">Edit</button>
                 <?php if (!$s['is_default']): ?>
                 <form method="post" data-confirm="Delete this status? Orders using it must be reassigned first."><?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= (int) $s['id'] ?>"><button type="submit" class="a-btn a-btn-danger a-btn-sm">Delete</button></form>
                 <?php endif; ?>

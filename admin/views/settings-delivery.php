@@ -15,7 +15,7 @@
             <td><?= $z['is_default'] ? '<span class="a-badge a-badge-on">Default</span>' : '' ?></td>
             <td><span class="a-badge <?= $z['is_active'] ? 'a-badge-on' : 'a-badge-off' ?>"><?= $z['is_active'] ? 'Active' : 'Hidden' ?></span></td>
             <td style="display:flex; gap:8px;">
-                <button type="button" class="a-btn a-btn-outline a-btn-sm" onclick='openZoneModal(<?= json_encode($z) ?>)'>Edit</button>
+                <button type="button" class="a-btn a-btn-outline a-btn-sm" data-zone='<?= e(json_encode($z)) ?>' onclick="openZoneModal(JSON.parse(this.dataset.zone))">Edit</button>
                 <form method="post" data-confirm="Remove this delivery zone?"><?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= (int) $z['id'] ?>"><button type="submit" class="a-btn a-btn-danger a-btn-sm">Delete</button></form>
             </td>
         </tr>
