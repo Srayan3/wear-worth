@@ -72,18 +72,16 @@ class CheckoutController
             flash_set('error', $e->getMessage());
             redirect('/checkout');
         } catch (Throwable $e) {
-    error_log('[CHECKOUT ERROR] ' . $e->getMessage());
-    error_log('[CHECKOUT FILE] ' . $e->getFile());
-    error_log('[CHECKOUT LINE] ' . $e->getLine());
-    error_log('[CHECKOUT TRACE] ' . $e->getTraceAsString());
-
-    flash_set(
-        'error',
-        'Checkout error: ' . $e->getMessage()
-    );
-
-    redirect('/checkout');
-}
+            error_log('[CHECKOUT ERROR] ' . $e->getMessage());
+            $message = 'Something went wrong placing your order. Please try again.';
+            // In local/dev environments (APP_DEBUG = true in config.php), surface the
+            // real error so it's actually possible to diagnose — never in production.
+            if (defined('APP_DEBUG') && APP_DEBUG) {
+                $message .= ' [DEBUG: ' . $e->getMessage() . ' in ' . basename($e->getFile()) . ':' . $e->getLine() . ']';
+            }
+            flash_set('error', $message);
+            redirect('/checkout');
+        }
 
         unset($_SESSION['old_input']);
         redirect('/order/success/' . $order['order_number']);

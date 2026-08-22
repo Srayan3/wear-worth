@@ -109,6 +109,7 @@ CREATE TABLE products (
     stock_quantity       INT UNSIGNED        NOT NULL DEFAULT 0,
     stock_status         ENUM('in_stock','out_of_stock') NOT NULL DEFAULT 'in_stock',
     has_variations        TINYINT(1)          NOT NULL DEFAULT 0,
+    size_chart_type       ENUM('clothing','footwear') NOT NULL DEFAULT 'clothing',
     is_featured          TINYINT(1)          NOT NULL DEFAULT 0,
     is_new_arrival        TINYINT(1)          NOT NULL DEFAULT 0,
     is_popular           TINYINT(1)          NOT NULL DEFAULT 0,
@@ -137,15 +138,20 @@ CREATE TABLE product_images (
     CONSTRAINT fk_product_images_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Per-product size chart (inches), shown as a table on the product page
+-- Per-product size chart. Two shapes share one table: clothing (inch
+-- measurements) uses chest/waist/hip/length; footwear (size conversion)
+-- uses uk/eu/us. Which one a product shows is products.size_chart_type.
 CREATE TABLE product_size_chart (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     product_id      INT UNSIGNED        NOT NULL,
-    size_label      VARCHAR(20)         NOT NULL,   -- XS, S, M, L, XL...
+    size_label      VARCHAR(20)         NOT NULL,   -- clothing: XS/S/M/L...  footwear: brand's own size (e.g. 38)
     chest_in        DECIMAL(5,2)        NULL,
     waist_in        DECIMAL(5,2)        NULL,
     hip_in          DECIMAL(5,2)        NULL,
     length_in       DECIMAL(5,2)        NULL,
+    uk_size         VARCHAR(10)         NULL,        -- footwear only: UK / Bata
+    eu_size         VARCHAR(10)         NULL,        -- footwear only: EU / Apex
+    us_size         VARCHAR(10)         NULL,        -- footwear only: US
     sort_order      INT UNSIGNED        NOT NULL DEFAULT 0,
     KEY idx_size_chart_product (product_id),
     CONSTRAINT fk_size_chart_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE

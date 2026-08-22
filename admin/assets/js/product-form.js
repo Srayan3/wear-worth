@@ -129,7 +129,7 @@
         });
     }
 
-    // ---- Repeater: size chart ----
+    // ---- Repeater: size chart (clothing) ----
     var addSizeChartBtn = document.getElementById('addSizeChartRow');
     if (addSizeChartBtn) {
         addSizeChartBtn.addEventListener('click', function () {
@@ -145,5 +145,39 @@
             row.querySelector('.a-repeater-remove').addEventListener('click', function () { row.remove(); });
             document.getElementById('sizeChartRows').appendChild(row);
         });
+    }
+
+    // ---- Repeater: size chart (footwear) ----
+    var addFootwearChartBtn = document.getElementById('addFootwearChartRow');
+    if (addFootwearChartBtn) {
+        addFootwearChartBtn.addEventListener('click', function () {
+            var row = document.createElement('div');
+            row.className = 'a-repeater-row a-repeater-row--4col';
+            row.innerHTML =
+                '<input type="text" name="sc_brand_size[]" class="a-input" placeholder="Brand Size (e.g. 38)">' +
+                '<input type="text" name="sc_uk[]" class="a-input" placeholder="UK / Bata">' +
+                '<input type="text" name="sc_eu[]" class="a-input" placeholder="EU / Apex">' +
+                '<input type="text" name="sc_us[]" class="a-input" placeholder="US">' +
+                '<button type="button" class="a-repeater-remove">✕</button>';
+            row.querySelector('.a-repeater-remove').addEventListener('click', function () { row.remove(); });
+            document.getElementById('footwearChartRows').appendChild(row);
+        });
+    }
+
+    // ---- Size chart type toggle ----
+    // Only the visible block's inputs should submit — disabling the hidden
+    // block's inputs excludes them from the form POST entirely.
+    var sizeChartTypeSelect = document.getElementById('sizeChartType');
+    if (sizeChartTypeSelect) {
+        var clothingBlock = document.getElementById('clothingSizeChart');
+        var footwearBlock = document.getElementById('footwearSizeChart');
+        function syncSizeChartType() {
+            var isFootwear = sizeChartTypeSelect.value === 'footwear';
+            clothingBlock.style.display = isFootwear ? 'none' : '';
+            footwearBlock.style.display = isFootwear ? '' : 'none';
+            clothingBlock.querySelectorAll('input').forEach(function (el) { el.disabled = isFootwear; });
+            footwearBlock.querySelectorAll('input').forEach(function (el) { el.disabled = !isFootwear; });
+        }
+        sizeChartTypeSelect.addEventListener('change', syncSizeChartType);
     }
 })();

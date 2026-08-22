@@ -69,15 +69,31 @@ if (is_post()) {
         }
 
         if ($action === 'save_size_chart' && $id) {
+            $type = in_array($_POST['size_chart_type'] ?? '', ['clothing', 'footwear'], true) ? $_POST['size_chart_type'] : 'clothing';
             $rows = [];
-            $sizeLabels = $_POST['sc_size'] ?? [];
-            for ($i = 0; $i < count($sizeLabels); $i++) {
-                $rows[] = [
-                    'size' => clean_str($sizeLabels[$i] ?? ''),
-                    'chest' => $_POST['sc_chest'][$i] ?? '', 'waist' => $_POST['sc_waist'][$i] ?? '',
-                    'hip' => $_POST['sc_hip'][$i] ?? '', 'length' => $_POST['sc_length'][$i] ?? '',
-                ];
+            if ($type === 'footwear') {
+                $sizeLabels = $_POST['sc_brand_size'] ?? [];
+                for ($i = 0; $i < count($sizeLabels); $i++) {
+                    $rows[] = [
+                        'size' => clean_str($sizeLabels[$i] ?? ''),
+                        'uk'   => clean_str($_POST['sc_uk'][$i] ?? ''),
+                        'eu'   => clean_str($_POST['sc_eu'][$i] ?? ''),
+                        'us'   => clean_str($_POST['sc_us'][$i] ?? ''),
+                    ];
+                }
+            } else {
+                $sizeLabels = $_POST['sc_size'] ?? [];
+                for ($i = 0; $i < count($sizeLabels); $i++) {
+                    $rows[] = [
+                        'size'   => clean_str($sizeLabels[$i] ?? ''),
+                        'chest'  => $_POST['sc_chest'][$i] ?? '',
+                        'waist'  => $_POST['sc_waist'][$i] ?? '',
+                        'hip'    => $_POST['sc_hip'][$i] ?? '',
+                        'length' => $_POST['sc_length'][$i] ?? '',
+                    ];
+                }
             }
+            Product::updateSizeChartType($id, $type);
             Product::replaceSizeChart($id, $rows);
             flash_set('success', 'Size chart saved.');
             redirect('admin/product-form.php?id=' . $id . '#sizechart');

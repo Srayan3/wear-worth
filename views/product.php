@@ -124,6 +124,22 @@ $hasVariations = !empty($product['variations']);
                 </div>
                 <?php if (!empty($product['size_chart'])): ?>
                 <div class="tabs__panel" id="tabSizeChart">
+                    <?php if (($product['size_chart_type'] ?? 'clothing') === 'footwear'): ?>
+                    <p>Size conversion guide.</p>
+                    <table class="size-chart-table">
+                        <thead><tr><th><?= e(setting('store_name', 'Atelier')) ?> Size</th><th>UK / Bata</th><th>EU / Apex</th><th>US</th></tr></thead>
+                        <tbody>
+                        <?php foreach ($product['size_chart'] as $row): ?>
+                            <tr>
+                                <td><?= e($row['size_label']) ?></td>
+                                <td><?= $row['uk_size'] !== null && $row['uk_size'] !== '' ? e($row['uk_size']) : '—' ?></td>
+                                <td><?= $row['eu_size'] !== null && $row['eu_size'] !== '' ? e($row['eu_size']) : '—' ?></td>
+                                <td><?= $row['us_size'] !== null && $row['us_size'] !== '' ? e($row['us_size']) : '—' ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    <?php else: ?>
                     <p>All measurements in inches, taken flat.</p>
                     <table class="size-chart-table">
                         <thead><tr><th>Size</th><th>Chest</th><th>Waist</th><th>Hip</th><th>Length</th></tr></thead>
@@ -139,6 +155,7 @@ $hasVariations = !empty($product['variations']);
                         <?php endforeach; ?>
                         </tbody>
                     </table>
+                    <?php endif; ?>
                 </div>
                 <?php endif; ?>
             </div>

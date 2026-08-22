@@ -119,25 +119,56 @@
 
     <!-- ============ SIZE CHART ============ -->
     <?php if ($id): ?>
+    <?php $chartType = $product['size_chart_type'] ?? 'clothing'; ?>
     <div class="a-tabs__panel" id="tabSizeChart">
         <form method="post" action="<?= admin_url('product-form.php?id=' . $id) ?>" id="sizeChartForm">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="save_size_chart">
             <div class="a-card a-card--solid">
-                <p class="a-hint" style="margin-bottom:14px;">Measurements in inches — shown to shoppers as a size guide table on the product page.</p>
-                <div id="sizeChartRows">
-                    <?php foreach ($sizeChart as $row): ?>
-                    <div class="a-repeater-row">
-                        <input type="text" name="sc_size[]" class="a-input" placeholder="Size (e.g. M)" value="<?= e($row['size_label']) ?>">
-                        <input type="number" step="0.1" name="sc_chest[]" class="a-input" placeholder="Chest (in)" value="<?= e((string) ($row['chest_in'] ?? '')) ?>">
-                        <input type="number" step="0.1" name="sc_waist[]" class="a-input" placeholder="Waist (in)" value="<?= e((string) ($row['waist_in'] ?? '')) ?>">
-                        <input type="number" step="0.1" name="sc_hip[]" class="a-input" placeholder="Hip (in)" value="<?= e((string) ($row['hip_in'] ?? '')) ?>">
-                        <input type="number" step="0.1" name="sc_length[]" class="a-input" placeholder="Length (in)" value="<?= e((string) ($row['length_in'] ?? '')) ?>">
-                        <button type="button" class="a-repeater-remove" onclick="this.closest('.a-repeater-row').remove()">✕</button>
-                    </div>
-                    <?php endforeach; ?>
+                <div class="a-field" style="max-width:340px;">
+                    <label>Size Chart Type</label>
+                    <select name="size_chart_type" id="sizeChartType" class="a-select">
+                        <option value="clothing" <?= $chartType === 'clothing' ? 'selected' : '' ?>>Clothing — S / M / L measurements</option>
+                        <option value="footwear" <?= $chartType === 'footwear' ? 'selected' : '' ?>>Footwear — size conversion</option>
+                    </select>
+                    <p class="a-hint">Switches which kind of size guide table shows on this product's page.</p>
                 </div>
-                <button type="button" class="a-btn a-btn-outline a-btn-sm" id="addSizeChartRow" style="margin-bottom:16px;">+ Add Size</button>
+
+                <!-- Clothing: Size / Chest / Waist / Hip / Length (inches) -->
+                <div id="clothingSizeChart" style="<?= $chartType === 'footwear' ? 'display:none;' : '' ?>">
+                    <p class="a-hint" style="margin-bottom:14px;">Measurements in inches — shown to shoppers as a size guide table on the product page.</p>
+                    <div id="sizeChartRows">
+                        <?php foreach ($sizeChart as $row): ?>
+                        <div class="a-repeater-row">
+                            <input type="text" name="sc_size[]" class="a-input" placeholder="Size (e.g. M)" value="<?= e($row['size_label']) ?>" <?= $chartType !== 'clothing' ? 'disabled' : '' ?>>
+                            <input type="number" step="0.1" name="sc_chest[]" class="a-input" placeholder="Chest (in)" value="<?= e((string) ($row['chest_in'] ?? '')) ?>" <?= $chartType !== 'clothing' ? 'disabled' : '' ?>>
+                            <input type="number" step="0.1" name="sc_waist[]" class="a-input" placeholder="Waist (in)" value="<?= e((string) ($row['waist_in'] ?? '')) ?>" <?= $chartType !== 'clothing' ? 'disabled' : '' ?>>
+                            <input type="number" step="0.1" name="sc_hip[]" class="a-input" placeholder="Hip (in)" value="<?= e((string) ($row['hip_in'] ?? '')) ?>" <?= $chartType !== 'clothing' ? 'disabled' : '' ?>>
+                            <input type="number" step="0.1" name="sc_length[]" class="a-input" placeholder="Length (in)" value="<?= e((string) ($row['length_in'] ?? '')) ?>" <?= $chartType !== 'clothing' ? 'disabled' : '' ?>>
+                            <button type="button" class="a-repeater-remove" onclick="this.closest('.a-repeater-row').remove()">✕</button>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <button type="button" class="a-btn a-btn-outline a-btn-sm" id="addSizeChartRow" style="margin-bottom:16px;">+ Add Size</button>
+                </div>
+
+                <!-- Footwear: Brand Size / UK-Bata / EU-Apex / US -->
+                <div id="footwearSizeChart" style="<?= $chartType === 'footwear' ? '' : 'display:none;' ?>">
+                    <p class="a-hint" style="margin-bottom:14px;">Your brand's own size, then the equivalent UK/Bata, EU/Apex, and US sizes.</p>
+                    <div id="footwearChartRows">
+                        <?php foreach ($sizeChart as $row): ?>
+                        <div class="a-repeater-row a-repeater-row--4col">
+                            <input type="text" name="sc_brand_size[]" class="a-input" placeholder="Brand Size (e.g. 38)" value="<?= e($row['size_label']) ?>" <?= $chartType !== 'footwear' ? 'disabled' : '' ?>>
+                            <input type="text" name="sc_uk[]" class="a-input" placeholder="UK / Bata" value="<?= e($row['uk_size'] ?? '') ?>" <?= $chartType !== 'footwear' ? 'disabled' : '' ?>>
+                            <input type="text" name="sc_eu[]" class="a-input" placeholder="EU / Apex" value="<?= e($row['eu_size'] ?? '') ?>" <?= $chartType !== 'footwear' ? 'disabled' : '' ?>>
+                            <input type="text" name="sc_us[]" class="a-input" placeholder="US" value="<?= e($row['us_size'] ?? '') ?>" <?= $chartType !== 'footwear' ? 'disabled' : '' ?>>
+                            <button type="button" class="a-repeater-remove" onclick="this.closest('.a-repeater-row').remove()">✕</button>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <button type="button" class="a-btn a-btn-outline a-btn-sm" id="addFootwearChartRow" style="margin-bottom:16px;">+ Add Size</button>
+                </div>
+
                 <br>
                 <button type="submit" class="a-btn a-btn-primary">Save Size Chart</button>
             </div>

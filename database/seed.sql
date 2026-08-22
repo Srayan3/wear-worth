@@ -168,6 +168,16 @@ INSERT INTO product_size_chart (product_id, size_label, chest_in, waist_in, hip_
 (8, 'S', 32, 26, 35, 40, 1), (8, 'M', 34, 28, 37, 41, 2), (8, 'L', 36, 30, 39, 42, 3),
 (11,'S', 36, 32, 40, 54, 1), (11,'M', 38, 34, 42, 55, 2), (11,'L', 40, 36, 44, 56, 3);
 
+-- Footwear size conversion chart (brand size / UK-Bata / EU-Apex / US) — shown
+-- instead of the clothing measurement table when a product's
+-- size_chart_type = 'footwear'. Applied to the two footwear products.
+UPDATE products SET size_chart_type = 'footwear' WHERE id IN (19, 20);
+INSERT INTO product_size_chart (product_id, size_label, uk_size, eu_size, us_size, sort_order) VALUES
+(19, '35', '2', '35', '5', 1), (19, '36', '3', '36', '6', 2), (19, '37', '4', '37', '7', 3),
+(19, '38', '5', '38', '8', 4), (19, '39', '6', '39', '9', 5), (19, '40', '7', '40', '10', 6), (19, '41', '8', '41', '11', 7),
+(20, '35', '2', '35', '5', 1), (20, '36', '3', '36', '6', 2), (20, '37', '4', '37', '7', 3),
+(20, '38', '5', '38', '8', 4), (20, '39', '6', '39', '9', 5), (20, '40', '7', '40', '10', 6), (20, '41', '8', '41', '11', 7);
+
 -- ----------------------------------------------------------------------------
 -- Purchasable variations (size and/or color)
 -- ----------------------------------------------------------------------------

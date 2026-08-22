@@ -317,10 +317,10 @@ class Product
         $stmt = $db->prepare(
             "INSERT INTO products
                 (subcategory_id, name, slug, sku, short_description, description, price, discount_price,
-                 stock_quantity, stock_status, has_variations, is_featured, is_new_arrival, is_popular, is_active)
+                 stock_quantity, stock_status, has_variations, size_chart_type, is_featured, is_new_arrival, is_popular, is_active)
              VALUES
                 (:subcategory_id, :name, :slug, :sku, :short_description, :description, :price, :discount_price,
-                 :stock_quantity, :stock_status, :has_variations, :is_featured, :is_new_arrival, :is_popular, :is_active)"
+                 :stock_quantity, :stock_status, :has_variations, :size_chart_type, :is_featured, :is_new_arrival, :is_popular, :is_active)"
         );
         $stmt->execute([
             'subcategory_id'     => $data['subcategory_id'],
@@ -334,6 +334,7 @@ class Product
             'stock_quantity'     => $data['stock_quantity'] ?? 0,
             'stock_status'       => $data['stock_status'] ?? 'in_stock',
             'has_variations'     => $data['has_variations'] ?? 0,
+            'size_chart_type'    => in_array($data['size_chart_type'] ?? '', ['clothing', 'footwear'], true) ? $data['size_chart_type'] : 'clothing',
             'is_featured'        => $data['is_featured'] ?? 0,
             'is_new_arrival'     => $data['is_new_arrival'] ?? 0,
             'is_popular'         => $data['is_popular'] ?? 0,
@@ -352,7 +353,9 @@ class Product
                 short_description = :short_description, description = :description,
                 price = :price, discount_price = :discount_price,
                 stock_quantity = :stock_quantity, stock_status = :stock_status,
-                has_variations = :has_variations, is_featured = :is_featured,
+                has_variations = :has_variations,
+                size_chart_type = COALESCE(:size_chart_type, size_chart_type),
+                is_featured = :is_featured,
                 is_new_arrival = :is_new_arrival, is_popular = :is_popular, is_active = :is_active
              WHERE id = :id"
         );
@@ -368,6 +371,9 @@ class Product
             'stock_quantity'     => $data['stock_quantity'] ?? 0,
             'stock_status'       => $data['stock_status'] ?? 'in_stock',
             'has_variations'     => $data['has_variations'] ?? 0,
+            // Only ever overwritten when explicitly present (e.g. from the Size
+            // Chart tab) — saving Basic Info alone must never reset this.
+            'size_chart_type'    => (isset($data['size_chart_type']) && in_array($data['size_chart_type'], ['clothing', 'footwear'], true)) ? $data['size_chart_type'] : null,
             'is_featured'        => $data['is_featured'] ?? 0,
             'is_new_arrival'     => $data['is_new_arrival'] ?? 0,
             'is_popular'         => $data['is_popular'] ?? 0,
@@ -549,14 +555,23 @@ class Product
         }
     }
 
+    /**
+     * Replaces a product's size chart rows. $rows is a unified shape covering
+     * both chart types — pass whichever fields apply for size_chart_type and
+     * leave the rest empty/omitted:
+     *   clothing: size, chest, waist, hip, length
+     *   footwear: size (brand's own size), uk, eu, us
+     */
     public static function replaceSizeChart(int $productId, array $rows): void
     {
         $db = Database::connect();
         $db->prepare("DELETE FROM product_size_chart WHERE product_id = :pid")->execute(['pid' => $productId]);
         $stmt = $db->prepare(
-            "INSERT INTO product_size_chart (product_id, size_label, chest_in, waist_in, hip_in, length_in, sort_order)
-             VALUES (:pid, :size, :chest, :waist, :hip, :length, :sort)"
+            "INSERT INTO product_size_chart
+                (product_id, size_label, chest_in, waist_in, hip_in, length_in, uk_size, eu_size, us_size, sort_order)
+             VALUES (:pid, :size, :chest, :waist, :hip, :length, :uk, :eu, :us, :sort)"
         );
+        $blank = fn($v) => ($v === null || $v === '') ? null : $v;
         $i = 0;
         foreach ($rows as $r) {
             if (empty($r['size'])) {
@@ -565,12 +580,22 @@ class Product
             $stmt->execute([
                 'pid'    => $productId,
                 'size'   => $r['size'],
-                'chest'  => $r['chest'] !== '' ? $r['chest'] : null,
-                'waist'  => $r['waist'] !== '' ? $r['waist'] : null,
-                'hip'    => $r['hip'] !== '' ? $r['hip'] : null,
-                'length' => $r['length'] !== '' ? $r['length'] : null,
+                'chest'  => $blank($r['chest'] ?? null),
+                'waist'  => $blank($r['waist'] ?? null),
+                'hip'    => $blank($r['hip'] ?? null),
+                'length' => $blank($r['length'] ?? null),
+                'uk'     => $blank($r['uk'] ?? null),
+                'eu'     => $blank($r['eu'] ?? null),
+                'us'     => $blank($r['us'] ?? null),
                 'sort'   => $i++,
             ]);
         }
+    }
+
+    public static function updateSizeChartType(int $id, string $type): void
+    {
+        $db = Database::connect();
+        $stmt = $db->prepare("UPDATE products SET size_chart_type = :type WHERE id = :id");
+        $stmt->execute(['type' => in_array($type, ['clothing', 'footwear'], true) ? $type : 'clothing', 'id' => $id]);
     }
 }

@@ -190,6 +190,7 @@ img { max-width: 100%; }
 /* ---- Variation / size chart builder rows ---- */
 .a-repeater-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; }
 .a-repeater-row--size { grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; }
+.a-repeater-row--4col { grid-template-columns: 1fr 1fr 1fr 1fr auto; }
 .a-repeater-remove { background: none; border: none; color: var(--a-danger); cursor: pointer; font-size: 18px; line-height: 1; padding: 6px; }
 @media (max-width: 900px) { .a-repeater-row, .a-repeater-row--size { grid-template-columns: 1fr; } }
 
