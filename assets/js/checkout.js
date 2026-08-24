@@ -26,9 +26,9 @@
             deliveryEl.textContent = format(charge);
             console.log(charge);
             if(charge > 80){
-                extraNote.textContent = "You need to pay the delivery charge in advance if you're ordering from outside Dhaka.";
+                extraNote.innerHTML = "<strong>Extra Note:</strong> You need to pay the delivery charge in advance if you're ordering from outside Dhaka.";
             } else {
-                extraNote.textContent = "—";
+                extraNote.textContent = "";
             }
             totalEl.textContent = format(subtotal + charge);
         }
