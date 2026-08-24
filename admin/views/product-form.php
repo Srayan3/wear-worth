@@ -91,6 +91,13 @@
     <!-- ============ VARIATIONS ============ -->
     <?php if ($id): ?>
     <div class="a-tabs__panel" id="tabVariations">
+        <?php if (!empty($product['has_variations']) && empty($variations)): ?>
+        <div class="a-flash a-flash--error">
+            <strong>Nothing to buy yet:</strong> this product is marked "Has size/color variations" but has zero saved options.
+            Customers see "select a size/color" with no way to pick one. Add at least one row below (with a Size and/or Color filled in),
+            or uncheck "Has size/color variations" in the Basic Info tab if this product shouldn't use options at all.
+        </div>
+        <?php endif; ?>
         <form method="post" action="<?= admin_url('product-form.php?id=' . $id) ?>" id="variationsForm">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="save_variations">

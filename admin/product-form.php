@@ -56,15 +56,32 @@ if (is_post()) {
             $skus = $_POST['var_sku'] ?? [];
             $prices = $_POST['var_price'] ?? [];
             $qtys = $_POST['var_qty'] ?? [];
-            for ($i = 0; $i < count($sizes); $i++) {
+            $submittedCount = count($sizes);
+            for ($i = 0; $i < $submittedCount; $i++) {
                 $rows[] = [
                     'size' => clean_str($sizes[$i] ?? ''), 'color' => clean_str($colors[$i] ?? ''),
                     'hex' => clean_str($hexes[$i] ?? ''), 'sku' => clean_str($skus[$i] ?? ''),
                     'price' => $prices[$i] ?? '', 'qty' => $qtys[$i] ?? 0, 'image' => null,
                 ];
             }
+            // Rows with neither a size nor a color are unsavable (nothing to
+            // purchase) — replaceVariations() drops them and auto-corrects
+            // has_variations to match what actually got saved. Tell the admin
+            // plainly if any row was dropped, so a "0 saved" isn't mistaken
+            // for success.
+            $keptCount = count(array_filter($rows, fn($r) => $r['size'] !== '' || $r['color'] !== ''));
+            $droppedCount = $submittedCount - $keptCount;
+
             Product::replaceVariations($id, $rows);
-            flash_set('success', 'Variations saved.');
+
+            if ($keptCount === 0 && $submittedCount > 0) {
+                flash_set('error', "None of the {$submittedCount} row(s) were saved — every row needs a Size and/or a Color filled in. \"Has size/color variations\" has been automatically unchecked since there's nothing to sell.");
+            } elseif ($droppedCount > 0) {
+                flash_set('error', "Saved {$keptCount} variation(s), but {$droppedCount} row(s) were skipped because they had no Size or Color — fill those in or remove the empty rows.");
+            } else {
+                flash_set('success', "Saved {$keptCount} variation(s).");
+            }
+
             redirect('admin/product-form.php?id=' . $id . '#variations');
         }
 

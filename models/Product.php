@@ -290,7 +290,8 @@ class Product
         $stmt = $db->prepare(
             "SELECT p.*, sub.name AS subcategory_name,
                     (SELECT image_path FROM product_images pi WHERE pi.product_id = p.id
-                        ORDER BY pi.is_primary DESC, pi.sort_order ASC LIMIT 1) AS primary_image
+                        ORDER BY pi.is_primary DESC, pi.sort_order ASC LIMIT 1) AS primary_image,
+                    (SELECT COUNT(*) FROM product_variations pv WHERE pv.product_id = p.id AND pv.is_active = 1) AS variation_count
              FROM products p
              JOIN subcategories sub ON sub.id = p.subcategory_id
              WHERE {$whereSql}
