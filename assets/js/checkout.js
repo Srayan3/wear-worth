@@ -25,6 +25,11 @@
             var charge = checked ? parseFloat(checked.dataset.charge || '0') : 0;
             deliveryEl.textContent = format(charge);
             console.log(charge);
+            if(charge > 80){
+                extraNote.textContent = "You need to pay the delivery charge in advance if you're ordering from outside Dhaka.";
+            } else {
+                extraNote.textContent = "—";
+            }
             totalEl.textContent = format(subtotal + charge);
         }
 
