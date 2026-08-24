@@ -96,6 +96,7 @@
                 <?php endforeach; ?>
                 <div class="summary-row" style="margin-top:16px;"><span>Subtotal</span><span id="checkoutSubtotal" data-value="<?= (float) $subtotal ?>"><?= money($subtotal) ?></span></div>
                 <div class="summary-row"><span>Delivery</span><span id="checkoutDelivery">—</span></div>
+                <div class="summary-row"><span>Extra Note</span><span id="checkoutDeliveryNote">—</span></div>
                 <div class="summary-row total"><span>Total</span><span id="checkoutTotal"><?= money($subtotal) ?></span></div>
                 <button type="submit" class="btn btn-primary btn-block" style="margin-top:18px;">Place Order</button>
                 <p style="font-size:11.5px; color:var(--text-muted); margin-top:12px; text-align:center;">By placing this order you agree to pay the total above via your selected method.</p>

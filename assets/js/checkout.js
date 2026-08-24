@@ -9,6 +9,7 @@
         var subtotalEl = document.getElementById('checkoutSubtotal');
         var deliveryEl = document.getElementById('checkoutDelivery');
         var totalEl = document.getElementById('checkoutTotal');
+        var extraNote = document.getElementById('checkoutDeliveryNote');
         var radios = document.querySelectorAll('input[name="delivery_zone_id"]');
         if (!subtotalEl || !radios.length) return;
 
@@ -23,6 +24,7 @@
             var checked = document.querySelector('input[name="delivery_zone_id"]:checked');
             var charge = checked ? parseFloat(checked.dataset.charge || '0') : 0;
             deliveryEl.textContent = format(charge);
+            console.log(deiveryEl);
             totalEl.textContent = format(subtotal + charge);
         }
 
