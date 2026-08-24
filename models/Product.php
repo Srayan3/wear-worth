@@ -538,7 +538,6 @@ class Product
                 (product_id, size_label, color_name, color_hex, sku, price_override, stock_quantity, image_path, is_active)
              VALUES (:pid, :size, :color, :hex, :sku, :price, :qty, :image, 1)"
         );
-        $savedCount = 0;
         foreach ($variations as $v) {
             if (empty($v['size']) && empty($v['color'])) {
                 continue;
@@ -553,17 +552,7 @@ class Product
                 'qty'   => $v['qty'] ?: 0,
                 'image' => $v['image'] ?: null,
             ]);
-            $savedCount++;
         }
-
-        // Keep the product's has_variations flag in sync with what was
-        // actually saved here — this is the single place variations are
-        // written, so this is also the one place that can never let the
-        // flag drift out of sync with reality (e.g. checked "has
-        // variations" but no rows ever saved, leaving the product
-        // impossible to buy since nothing exists for a shopper to pick).
-        $db->prepare("UPDATE products SET has_variations = :hv WHERE id = :id")
-            ->execute(['hv' => $savedCount > 0 ? 1 : 0, 'id' => $productId]);
     }
 
     /**

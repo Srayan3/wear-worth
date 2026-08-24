@@ -84,11 +84,7 @@ class Cart
                 return ['success' => false, 'message' => 'Please choose a valid size/color.'];
             }
             $availableStock = $variation['stock_quantity'];
-        } elseif ($product['has_variations'] && !empty(Product::variations($productId))) {
-            // Only actually require a selection when the product has real,
-            // active variation rows to choose from — a product flagged as
-            // "has variations" with none saved yet must stay purchasable as
-            // a simple product rather than becoming impossible to buy.
+        } elseif ($product['has_variations']) {
             return ['success' => false, 'message' => 'Please select a size/color before adding to cart.'];
         }
 
