@@ -24,7 +24,7 @@
             var checked = document.querySelector('input[name="delivery_zone_id"]:checked');
             var charge = checked ? parseFloat(checked.dataset.charge || '0') : 0;
             deliveryEl.textContent = format(charge);
-            console.log(deiveryEl);
+            console.log(charge);
             totalEl.textContent = format(subtotal + charge);
         }
 
