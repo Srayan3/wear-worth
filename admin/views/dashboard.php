@@ -1,5 +1,5 @@
 <?php
-$maxSale = max(1, ...array_column($stats['salesLast7Days'], 'total'));
+$maxSale = max([1, ...array_column($stats['salesLast7Days'], 'total')]);
 $statusCounts = $stats['counts'];
 ?>
 <div class="stat-grid">
