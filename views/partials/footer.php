@@ -46,7 +46,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <span><?= e(setting('footer_text', '© ' . date('Y') . ' ' . setting('store_name', 'Atelier') . '. All rights reserved.')) ?></span>
+            <span>Copyright © 2026 Wear Worth. All Rights Reserved. Designed and Developed by <strong><a style="color: white;" href="https://www.instagram.com/srayan007" target="_blank" aria-label="Shan Abrar Srayan">Shan Abrar Srayan</a></strong></span>
             <span>Cash on Delivery · bKash · Nagad</span>
         </div>
     </div>
