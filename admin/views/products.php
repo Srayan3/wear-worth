@@ -32,7 +32,11 @@
         <?php foreach ($result['items'] as $p): ?>
             <tr>
                 <td><img class="a-thumb" src="<?= product_image_url($p['primary_image']) ?>" alt=""></td>
-                <td><a href="<?= admin_url('product-form.php?id=' . $p['id']) ?>" style="font-weight:600;"><?= e($p['name']) ?></a></td>
+                <td><a href="<?= admin_url('product-form.php?id=' . $p['id']) ?>" style="font-weight:600;"><?= e($p['name']) ?></a>
+                    <?php if ($p['has_variations'] && (int) $p['variation_count'] === 0): ?>
+                    <br><span class="a-badge a-badge-danger" title="Marked as having variations but none are saved — customers can't buy this">⚠ No options saved</span>
+                    <?php endif; ?>
+                </td>
                 <td style="color:var(--a-muted);"><?= e($p['sku']) ?></td>
                 <td><?= e($p['subcategory_name']) ?></td>
                 <td>

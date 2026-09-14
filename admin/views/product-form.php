@@ -2,8 +2,8 @@
     <div class="a-tabs__nav">
         <button type="button" class="is-active" data-tab="tabBasic">Basic Info</button>
         <button type="button" data-tab="tabImages" <?= !$id ? 'disabled title="Save the product first"' : '' ?>>Images <?= $id ? '(' . count($images) . ')' : '' ?></button>
-        <button type="button" data-tab="tabVariations" <?= !$id ? 'disabled' : '' ?>>Variations <?= $id ? '(' . count($variations) . ')' : '' ?></button>
-        <button type="button" data-tab="tabSizeChart" <?= !$id ? 'disabled' : '' ?>>Size Chart</button>
+        <button type="button" data-tab="tabVariations" <?= !$id ? 'disabled' : '' ?>>Variations — buyable options <?= $id ? '(' . count($variations) . ')' : '' ?></button>
+        <button type="button" data-tab="tabSizeChart" <?= !$id ? 'disabled' : '' ?>>Size Chart — guide only</button>
     </div>
 
     <!-- ============ BASIC INFO ============ -->
@@ -91,10 +91,18 @@
     <!-- ============ VARIATIONS ============ -->
     <?php if ($id): ?>
     <div class="a-tabs__panel" id="tabVariations">
+        <?php if (!empty($product['has_variations']) && empty($variations)): ?>
+        <div class="a-flash a-flash--error">
+            <strong>Nothing to buy yet:</strong> this product is marked "Has size/color variations" but has zero saved options.
+            Customers see "select a size/color" with no way to pick one. Add at least one row below (with a Size and/or Color filled in),
+            or uncheck "Has size/color variations" in the Basic Info tab if this product shouldn't use options at all.
+        </div>
+        <?php endif; ?>
         <form method="post" action="<?= admin_url('product-form.php?id=' . $id) ?>" id="variationsForm">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="save_variations">
             <div class="a-card a-card--solid">
+                <p class="a-hint" style="margin-bottom:6px;"><strong>This is what customers pick to buy.</strong> Each row here becomes a selectable, in-stock option on the product page — different from the Size Chart tab, which is just a reference table and creates nothing purchasable.</p>
                 <p class="a-hint" style="margin-bottom:14px;">Leave size or color blank if the product doesn't use that dimension. Price is optional — it overrides the base price only for that combination.</p>
                 <div id="variationRows">
                     <?php foreach ($variations as $v): ?>
@@ -136,6 +144,7 @@
 
                 <!-- Clothing: Size / Chest / Waist / Hip / Length (inches) -->
                 <div id="clothingSizeChart" style="<?= $chartType === 'footwear' ? 'display:none;' : '' ?>">
+                    <p class="a-hint" style="margin-bottom:6px;"><strong>Reference guide only — this does not create anything customers can buy.</strong> It's just a measurement table shown on the product page to help shoppers pick a size. To let customers actually select and purchase a size, use the Variations tab instead.</p>
                     <p class="a-hint" style="margin-bottom:14px;">Measurements in inches — shown to shoppers as a size guide table on the product page.</p>
                     <div id="sizeChartRows">
                         <?php foreach ($sizeChart as $row): ?>
@@ -154,6 +163,7 @@
 
                 <!-- Footwear: Brand Size / UK-Bata / EU-Apex / US -->
                 <div id="footwearSizeChart" style="<?= $chartType === 'footwear' ? '' : 'display:none;' ?>">
+                    <p class="a-hint" style="margin-bottom:6px;"><strong>Reference guide only — this does not create anything customers can buy.</strong> It's just a size conversion table shown on the product page. To let customers actually select and purchase a size, use the Variations tab instead.</p>
                     <p class="a-hint" style="margin-bottom:14px;">Your brand's own size, then the equivalent UK/Bata, EU/Apex, and US sizes.</p>
                     <div id="footwearChartRows">
                         <?php foreach ($sizeChart as $row): ?>

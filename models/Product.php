@@ -290,7 +290,8 @@ class Product
         $stmt = $db->prepare(
             "SELECT p.*, sub.name AS subcategory_name,
                     (SELECT image_path FROM product_images pi WHERE pi.product_id = p.id
-                        ORDER BY pi.is_primary DESC, pi.sort_order ASC LIMIT 1) AS primary_image
+                        ORDER BY pi.is_primary DESC, pi.sort_order ASC LIMIT 1) AS primary_image,
+                    (SELECT COUNT(*) FROM product_variations pv WHERE pv.product_id = p.id AND pv.is_active = 1) AS variation_count
              FROM products p
              JOIN subcategories sub ON sub.id = p.subcategory_id
              WHERE {$whereSql}
@@ -415,12 +416,24 @@ class Product
             'is_active'         => 0,
         ]);
 
-        // Copy images (references, files are shared on disk)
-        $imgStmt = $db->prepare(
-            "INSERT INTO product_images (product_id, image_path, is_primary, sort_order)
-             SELECT :new_id, image_path, is_primary, sort_order FROM product_images WHERE product_id = :old_id"
+        // Copy images: physically duplicate each uploaded file so the new
+        // product's images are fully independent. Sharing a path between
+        // two products meant deleting an image from either one silently
+        // broke the other — this makes every product's files its own.
+        $imgStmt = $db->prepare("SELECT * FROM product_images WHERE product_id = :pid ORDER BY sort_order ASC");
+        $imgStmt->execute(['pid' => $id]);
+        $insertImg = $db->prepare(
+            "INSERT INTO product_images (product_id, image_path, is_primary, sort_order) VALUES (:pid, :path, :primary, :sort)"
         );
-        $imgStmt->execute(['new_id' => $newId, 'old_id' => $id]);
+        foreach ($imgStmt->fetchAll() as $img) {
+            $copiedPath = self::copyImageFile($img['image_path']);
+            $insertImg->execute([
+                'pid'     => $newId,
+                'path'    => $copiedPath ?? $img['image_path'],
+                'primary' => $img['is_primary'],
+                'sort'    => $img['sort_order'],
+            ]);
+        }
 
         $varStmt = $db->prepare(
             "INSERT INTO product_variations (product_id, size_label, color_name, color_hex, sku, price_override, stock_quantity, image_path, is_active)
@@ -519,12 +532,47 @@ class Product
     {
         // Only ever delete files that live under our own uploads directory —
         // never touch the bundled placeholder sample images.
-        if (str_starts_with($path, 'uploads/products/')) {
-            $full = ROOT_PATH . '/' . $path;
-            if (is_file($full)) {
-                @unlink($full);
-            }
+        if (!str_starts_with($path, 'uploads/products/')) {
+            return;
         }
+        // Defense in depth for any product duplicated before file-copying was
+        // added below: if another product's image row still points at this
+        // same path, leave the physical file alone — only remove it once
+        // nothing references it anymore.
+        $db = Database::connect();
+        $stmt = $db->prepare("SELECT COUNT(*) FROM product_images WHERE image_path = :path");
+        $stmt->execute(['path' => $path]);
+        if ((int) $stmt->fetchColumn() > 1) {
+            return;
+        }
+        $full = ROOT_PATH . '/' . $path;
+        if (is_file($full)) {
+            @unlink($full);
+        }
+    }
+
+    /**
+     * Physically duplicates an uploaded product image under a fresh random
+     * filename. Returns null for bundled placeholder images (outside
+     * uploads/products/, meant to be shared as-is) or if the copy fails,
+     * in which case the caller falls back to reusing the original path.
+     */
+    private static function copyImageFile(string $path): ?string
+    {
+        if (!str_starts_with($path, 'uploads/products/')) {
+            return null;
+        }
+        $source = ROOT_PATH . '/' . $path;
+        if (!is_file($source)) {
+            return null;
+        }
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        $newFilename = bin2hex(random_bytes(16)) . ($ext ? '.' . $ext : '');
+        $destination = UPLOAD_PATH . '/' . $newFilename;
+        if (!@copy($source, $destination)) {
+            return null;
+        }
+        return 'uploads/products/' . $newFilename;
     }
 
     // ---- Variations ----------------------------------------------------
@@ -538,6 +586,7 @@ class Product
                 (product_id, size_label, color_name, color_hex, sku, price_override, stock_quantity, image_path, is_active)
              VALUES (:pid, :size, :color, :hex, :sku, :price, :qty, :image, 1)"
         );
+        $savedCount = 0;
         foreach ($variations as $v) {
             if (empty($v['size']) && empty($v['color'])) {
                 continue;
@@ -552,7 +601,17 @@ class Product
                 'qty'   => $v['qty'] ?: 0,
                 'image' => $v['image'] ?: null,
             ]);
+            $savedCount++;
         }
+
+        // Keep the product's has_variations flag in sync with what was
+        // actually saved here — this is the single place variations are
+        // written, so this is also the one place that can never let the
+        // flag drift out of sync with reality (e.g. checked "has
+        // variations" but no rows ever saved, leaving the product
+        // impossible to buy since nothing exists for a shopper to pick).
+        $db->prepare("UPDATE products SET has_variations = :hv WHERE id = :id")
+            ->execute(['hv' => $savedCount > 0 ? 1 : 0, 'id' => $productId]);
     }
 
     /**
